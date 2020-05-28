@@ -67,7 +67,7 @@ public class UssdModule extends ReactContextBaseJavaModule {
                String someData = intent.getStringExtra("ussd-data");
                WritableMap params = Arguments.createMap();
                params.putString("ussdmessage", someData);
-               sendEvent(reactContext, "USSDEvents", params);
+               sendEvent(reactContext, "ussdevents", params);
          }
    }
 

@@ -25,9 +25,9 @@ import javax.annotation.Nullable;
 
 import android.content.Intent;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-public class USSDService extends AccessibilityService {
+public class UssdService extends AccessibilityService {
 
-    public static String TAG = USSDService.class.getSimpleName();
+    public static String TAG = UssdService.class.getSimpleName();
     private static ReactApplicationContext reactContext;
 
     @Override
