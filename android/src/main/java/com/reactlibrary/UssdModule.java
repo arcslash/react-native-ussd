@@ -34,7 +34,7 @@ public class UssdModule extends ReactContextBaseJavaModule {
         this.reactContext = reactContext;
         this.mLocalBroadcastReceiver = new LocalBroadcastReceiver();
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(reactContext);
-        localBroadcastManager.registerReceiver(mLocalBroadcastReceiver, new IntentFilter("my-custom-event"));
+        localBroadcastManager.registerReceiver(mLocalBroadcastReceiver, new IntentFilter("ussd-event"));
     }
 
     private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
@@ -64,10 +64,10 @@ public class UssdModule extends ReactContextBaseJavaModule {
     public class LocalBroadcastReceiver extends BroadcastReceiver {
          @Override
          public void onReceive(Context context, Intent intent) {
-               String someData = intent.getStringExtra("my-extra-data");
+               String someData = intent.getStringExtra("ussd-data");
                WritableMap params = Arguments.createMap();
-               params.putString("eventProperty", someData);
-               sendEvent(reactContext, "EventReminder", params);
+               params.putString("ussdmessage", someData);
+               sendEvent(reactContext, "USSDEvents", params);
          }
    }
 

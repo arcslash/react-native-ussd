@@ -27,12 +27,15 @@ In addtion App must be enabled in the accessibility settings
 Settings > Accessibility > Select the App and enable Accessibility
 
 ### IOS
+[ TODO]
+
+....
 
 ### Dialing a USSD CODE
 ```javascript
 import Ussd from 'react-native-ussd';
 
-// TODO: What to do with the module?
+// Add USSD code you want to dial
 Ussd.dial("*#456#");
 ```
 Example Usecase
@@ -46,7 +49,6 @@ export default class App extends React.Component {
     expiryDate:''
   };
 
-
   async checkBalance(){
     let granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.CALL_PHONE,
@@ -54,24 +56,22 @@ export default class App extends React.Component {
         'title': 'I need to make some calls',
         'message': 'Give me permission to make calls '
       }
-    )
-  
+    )  
     if (granted) {
-      console.log( "CAN Make Calls" );
-      Ussd.dial('*#456#');
-      
+      console.log( "Permission Granted" );
+      Ussd.dial('*#456#');      
       console.log(this.state.userBalance);
     } 
     else {
-      console.log( "CALL MAKING Permission Denied" );
+      console.log( "Permission Denied" );
     }
   }
   componentDidMount(){
     const eventEmitter = new NativeEventEmitter(NativeModules.USSDDial);
-    this.eventListener = eventEmitter.addListener('EventReminder', (event) => {
-       console.log(event.eventProperty) 
-       let balance = event.eventProperty.split("is")[1].split(".Valid")[0];
-       let date = event.eventProperty.split("until")[1].split(".")[0];
+    this.eventListener = eventEmitter.addListener('USSDEvents', (event) => {
+       console.log(event.ussdmessage) 
+       let balance = event.ussdmessage.split("is")[1].split(".Valid")[0];
+       let date = event.ussdmessage.split("until")[1].split(".")[0];
        this.setState({
         userBalance:balance,
         expiryDate:date
@@ -89,13 +89,11 @@ export default class App extends React.Component {
         <TouchableOpacity onPress={() => this.checkBalance()}>
         <Text>Check Balance</Text>
         </TouchableOpacity>
-    <Text>Your Balance is: {this.state.userBalance}</Text>
-    <Text>Expiry Date is: {this.state.expiryDate}</Text>       
-        
-      </View>
+        <Text>Your Balance is: {this.state.userBalance}</Text>
+        <Text>Expiry Date is: {this.state.expiryDate}</Text>   
+    </View>
     );
   }
   
 }
 ```
-# react-native-ussd
