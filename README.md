@@ -73,7 +73,7 @@ export default class App extends React.Component {
     }
   }
   componentDidMount(){
-    const eventEmitter = new NativeEventEmitter(NativeModules.Ussd);
+    const eventEmitter = new NativeEventEmitter(Ussd);
     this.eventListener = eventEmitter.addListener('ussdevents', (event) => {
        console.log(event.ussdmessage) 
        let balance = event.ussdmessage.split("is")[1].split(".Valid")[0];
