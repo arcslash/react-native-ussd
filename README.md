@@ -42,12 +42,16 @@ Example Usecase
 
 ```javascript
 import * as React from 'react';
+import { Text, View, TouchableOpacity, PermissionsAndroid, NativeModules, NativeEventEmitter } from 'react-native';
 import Ussd from 'react-native-ussd';
+
+
 export default class App extends React.Component {
   state = {
     userBalance:0,
     expiryDate:''
   };
+
 
   async checkBalance(){
     let granted = await PermissionsAndroid.request(
@@ -56,19 +60,21 @@ export default class App extends React.Component {
         'title': 'I need to make some calls',
         'message': 'Give me permission to make calls '
       }
-    )  
+    )
+  
     if (granted) {
-      console.log( "Permission Granted" );
-      Ussd.dial('*#456#');      
+      console.log( "CAN Make Calls" );
+      Ussd.dial('*#456#');
+      
       console.log(this.state.userBalance);
     } 
     else {
-      console.log( "Permission Denied" );
+      console.log( "CALL MAKING Permission Denied" );
     }
   }
   componentDidMount(){
-    const eventEmitter = new NativeEventEmitter(NativeModules.USSDDial);
-    this.eventListener = eventEmitter.addListener('USSDEvents', (event) => {
+    const eventEmitter = new NativeEventEmitter(NativeModules.Ussd);
+    this.eventListener = eventEmitter.addListener('ussdevents', (event) => {
        console.log(event.ussdmessage) 
        let balance = event.ussdmessage.split("is")[1].split(".Valid")[0];
        let date = event.ussdmessage.split("until")[1].split(".")[0];
@@ -78,7 +84,6 @@ export default class App extends React.Component {
       })
        console.log(balance);
     });
-   
   }
   componentWillUnmount(){
     this.eventListener.remove();
@@ -89,9 +94,10 @@ export default class App extends React.Component {
         <TouchableOpacity onPress={() => this.checkBalance()}>
         <Text>Check Balance</Text>
         </TouchableOpacity>
-        <Text>Your Balance is: {this.state.userBalance}</Text>
-        <Text>Expiry Date is: {this.state.expiryDate}</Text>   
-    </View>
+    <Text>Your Balance is: {this.state.userBalance}</Text>
+    <Text>Expiry Date is: {this.state.expiryDate}</Text>       
+        
+      </View>
     );
   }
   
