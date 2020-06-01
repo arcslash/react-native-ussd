@@ -80,7 +80,7 @@ Example Usecase
 
 ```javascript
 import * as React from 'react';
-import { Text, View, TouchableOpacity, PermissionsAndroid, NativeModules, NativeEventEmitter } from 'react-native';
+import { Text, View, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import Ussd, {ussdEventEmitter} from 'react-native-ussd';
 
 
@@ -114,8 +114,8 @@ export default class App extends React.Component {
     
     this.eventListener = ussdEventEmitter.addListener('ussdEvent', (event) => {
        console.log(event.ussdReply) 
-       let balance = event.ussdmessage.split("is")[1].split(".Valid")[0];
-       let date = event.ussdmessage.split("until")[1].split(".")[0];
+       let balance = event.ussdReply.split("is")[1].split(".Valid")[0];
+       let date = event.ussdReply.split("until")[1].split(".")[0];
        this.setState({
         userBalance:balance,
         expiryDate:date

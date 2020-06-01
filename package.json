@@ -1,7 +1,7 @@
 {
   "name": "react-native-ussd",
   "title": "React Native Ussd",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "description": "USSD implementation for React Native",
   "main": "index.js",
   "files": [
