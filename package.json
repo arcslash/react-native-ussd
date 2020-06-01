@@ -1,8 +1,8 @@
 {
   "name": "react-native-ussd",
   "title": "React Native Ussd",
-  "version": "1.0.8",
-  "description": "TODO",
+  "version": "1.0.12",
+  "description": "USSD implementation for React Native",
   "main": "index.js",
   "files": [
     "README.md",
@@ -20,11 +20,13 @@
     "baseUrl": "https://github.com/isharaux/react-native-ussd.git"
   },
   "keywords": [
-    "react-native"
+    "react-native",
+    "ussd",
+    "ussd-dial"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "yourname@email.com"
+    "name": "Ishara Abeykoon",
+    "email": "isharaux@gmil.com"
   },
   "license": "MIT",
   "licenseFilename": "LICENSE",

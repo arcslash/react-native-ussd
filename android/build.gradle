@@ -73,6 +73,7 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0' //added
 }
 
 def configureReactNativePom(def pom) {
@@ -82,7 +83,7 @@ def configureReactNativePom(def pom) {
         name packageJson.title
         artifactId packageJson.name
         version = packageJson.version
-        group = "com.reactlibrary"
+        group = "com.isharaux.ussd"
         description packageJson.description
         url packageJson.repository.baseUrl
 

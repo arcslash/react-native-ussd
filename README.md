@@ -23,6 +23,9 @@ Add permissions to Make calls in the Manifest
 <uses-permission android:name="android.permission.CALL_PHONE"/>
 <application...>
 ```
+
+
+
 In addtion App must be enabled in the accessibility settings
 Settings > Accessibility > Select the App and enable Accessibility
 
@@ -32,18 +35,53 @@ Settings > Accessibility > Select the App and enable Accessibility
 ....
 
 ### Dialing a USSD CODE
+
+
+Ussd code can be dialled simply by calling dial method with required dialling number.
 ```javascript
 import Ussd from 'react-native-ussd';
 
 // Add USSD code you want to dial
 Ussd.dial("*#456#");
 ```
+
+A event listener should be initialized to listen for ussd replies from the dialling made using Ussd.dial()
+
+```javascript
+import Ussd, {ussdEventEmitter} from 'react-native-ussd';
+
+// Add USSD code you want to dial
+Ussd.dial("*#456#");
+
+
+....
+this.eventListener = ussdEventEmitter.addListener('ussdEvent', (event) => {
+       console.log(event.ussdReply) 
+       let balance = event.ussdmessage.split("is")[1].split(".Valid")[0];
+       let date = event.ussdmessage.split("until")[1].split(".")[0];
+       this.setState({
+        userBalance:balance,
+        expiryDate:date
+      })
+       console.log(balance);
+    });
+
+....
+
+//unregister the listener after using (probably in componentWillUnmount)
+this.eventListener.remove();
+....
+
+
+```
+
+
 Example Usecase
 
 ```javascript
 import * as React from 'react';
 import { Text, View, TouchableOpacity, PermissionsAndroid, NativeModules, NativeEventEmitter } from 'react-native';
-import Ussd from 'react-native-ussd';
+import Ussd, {ussdEventEmitter} from 'react-native-ussd';
 
 
 export default class App extends React.Component {
@@ -73,9 +111,9 @@ export default class App extends React.Component {
     }
   }
   componentDidMount(){
-    const eventEmitter = new NativeEventEmitter(Ussd);
-    this.eventListener = eventEmitter.addListener('ussdevents', (event) => {
-       console.log(event.ussdmessage) 
+    
+    this.eventListener = ussdEventEmitter.addListener('ussdEvent', (event) => {
+       console.log(event.ussdReply) 
        let balance = event.ussdmessage.split("is")[1].split(".Valid")[0];
        let date = event.ussdmessage.split("until")[1].split(".")[0];
        this.setState({
