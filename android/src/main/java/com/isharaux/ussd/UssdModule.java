@@ -1,6 +1,6 @@
-package com.ussddial;
+package com.isharaux.ussd;
 
-import android.widget.Toast;
+
 import android.net.Uri;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import android.content.BroadcastReceiver;
+
 import android.content.Context;
 import android.content.Intent;
 import javax.annotation.Nullable;
@@ -32,16 +32,12 @@ import com.facebook.react.bridge.Arguments;
 
 
 
-public class USSDDialModule extends ReactContextBaseJavaModule {
+public class UssdModule extends ReactContextBaseJavaModule {
   private static ReactApplicationContext reactContext;
-  private LocalBroadcastReceiver  mLocalBroadcastReceiver;
 
-  private static final String DURATION_SHORT_KEY = "SHORT";
-  private static final String DURATION_LONG_KEY = "LONG";
+  public static String TAG = UssdModule.class.getName();
 
-  public static String TAG = USSDDialModule.class.getName();
-
-  USSDDialModule(ReactApplicationContext context) {
+  UssdModule(ReactApplicationContext context) {
     super(context);
     reactContext = context;
   }
@@ -54,15 +50,17 @@ public class USSDDialModule extends ReactContextBaseJavaModule {
    @Override
   public Map<String, Object> getConstants() {
     final Map<String, Object> constants = new HashMap<>();
-    constants.put(DURATION_SHORT_KEY, Toast.LENGTH_SHORT);
-    constants.put(DURATION_LONG_KEY, Toast.LENGTH_LONG);
     return constants;
   }
 
 
     private static class RequestExecutionException extends Exception {
 
-        static String type = "ussd_plugin_ussd_execution_failure";
+        /**
+       *
+       */
+      private static final long serialVersionUID = 1L;
+      static String type = "ussd_plugin_ussd_execution_failure";
         String message;
 
         RequestExecutionException(String message) {
@@ -73,7 +71,6 @@ public class USSDDialModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void dial(String code) {
       Log.d(TAG, "Dialing code");  
-      final CompletableFuture<String> c = new CompletableFuture<>();
       TelephonyManager.UssdResponseCallback callback =
               new TelephonyManager.UssdResponseCallback() {
                   @Override
