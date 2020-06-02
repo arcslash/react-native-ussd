@@ -30,8 +30,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import com.ussddial.USSDService;
+
 
 public class USSDDialModule extends ReactContextBaseJavaModule {
   private static ReactApplicationContext reactContext;
