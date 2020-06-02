@@ -25,10 +25,6 @@ Add permissions to Make calls in the Manifest
 ```
 
 
-
-In addtion App must be enabled in the accessibility settings
-Settings > Accessibility > Select the App and enable Accessibility
-
 ### IOS
 [ TODO]
 
