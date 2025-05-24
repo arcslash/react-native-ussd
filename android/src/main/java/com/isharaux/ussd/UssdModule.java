@@ -9,6 +9,7 @@ import android.telecom.TelecomManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.SubscriptionManager;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.facebook.react.bridge.NativeModule;
@@ -92,7 +93,7 @@ public class UssdModule extends ReactContextBaseJavaModule {
         Log.d(TAG, "calling Dialing code");
         TelephonyManager manager = (TelephonyManager) this.reactContext.getSystemService(Context.TELEPHONY_SERVICE);
         TelephonyManager simManager = manager.createForSubscriptionId(SubscriptionManager.getDefaultSubscriptionId());
-        simManager.sendUssdRequest(code, callback, new Handler());
+        simManager.sendUssdRequest(code, callback, new Handler(Looper.getMainLooper()));
 
   }
 
