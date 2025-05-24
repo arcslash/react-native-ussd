@@ -1,5 +1,5 @@
 # react-native-ussd
-React Native Library to handle USSD.
+React Native Library to handle USSD. Basic dialing support for iOS is now available.
 
 TODO: Need to implement functionalities for IOS, Currently only work for Android
 ## Getting started
@@ -23,12 +23,15 @@ Add permissions to Make calls in the Manifest
 <uses-permission android:name="android.permission.CALL_PHONE"/>
 <application...>
 ```
-
+The library has been updated to target newer Android SDKs (API 33). Ensure your project's Android configuration is compatible.
 
 ### IOS
-[ TODO]
 
-....
+Basic USSD dialing is supported on iOS.
+- Calling `Ussd.dial()` will open the native iOS dialer and pre-fill the USSD code. The user then needs to manually initiate the call.
+- **Important Limitation:** iOS does not provide a way for applications to intercept or read the USSD responses. Therefore, the `ussdEventEmitter` (for `ussdEvent`) **will not work on iOS**. USSD responses cannot be captured by the application.
+- No special permissions are typically required for this functionality on iOS.
+
 
 ### Dialing a USSD CODE
 
@@ -52,6 +55,8 @@ Ussd.dial("*#456#");
 
 ....
 // in useEffect or in componentDidMount
+// IMPORTANT: The ussdEventEmitter is Android-specific due to platform limitations.
+// It will not fire any events on iOS as USSD responses cannot be intercepted.
 this.eventListener = ussdEventEmitter.addListener('ussdEvent', (event) => {
        console.log(event.ussdReply) 
        let balance = event.ussdReply.split("is")[1].split(".Valid")[0];
@@ -109,8 +114,10 @@ export default class App extends React.Component {
     }
   }
   componentDidMount(){
-    
+    // IMPORTANT: The ussdEventEmitter is Android-specific due to platform limitations.
+    // It will not fire any events on iOS as USSD responses cannot be intercepted.
     this.eventListener = ussdEventEmitter.addListener('ussdEvent', (event) => {
+      // This callback will only be triggered on Android.
        console.log(event.ussdReply) 
        let balance = event.ussdReply.split("is")[1].split(".Valid")[0];
        let date = event.ussdReply.split("until")[1].split(".")[0];
