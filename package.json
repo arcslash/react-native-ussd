@@ -6,13 +6,27 @@
   "main": "index.js",
   "files": [
     "README.md",
-    "android",
     "index.js",
-    "ios",
-    "react-native-ussd.podspec"
+    "android/build.gradle.kts",
+    "android/src/main/",
+    "android/gradle/",
+    "android/gradlew",
+    "android/gradlew.bat",
+    "ios/Ussd.swift",
+    "ios/Ussd-Bridging-Header.h",
+    "ios/Package.swift"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:js && npm run test:android && npm run test:ios",
+    "lint:js": "eslint .",
+    "lint": "npm run lint:js && (cd android && ./gradlew ktlintCheck)",
+    "test:android": "cd android && ./gradlew testDebugUnitTest",
+    "test:ios": "cd ios && swift test",
+    "test:js": "echo \"No JS tests yet\"",
+    "version:patch": "npm version patch -m \"chore(release): bump version to %s\"",
+    "version:minor": "npm version minor -m \"feat(release): bump version to %s\"",
+    "version:major": "npm version major -m \"feat(release): bump version to %s\"",
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -36,6 +50,7 @@
     "react-native": ">=0.60.0-rc.0 <1.0.x"
   },
   "devDependencies": {
+    "eslint": "^9.27.0",
     "react": "^16.9.0",
     "react-native": "^0.61.5"
   }

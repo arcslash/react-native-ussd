@@ -2,9 +2,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "Ussd", // This should match your module name, often the same as your project
+    name: "Ussd",
     platforms: [
-        .iOS(.v14) // Matching the deployment target we set
+        .iOS(.v14)
     ],
     products: [
         .library(
@@ -12,16 +12,22 @@ let package = Package(
             targets: ["Ussd"])
     ],
     dependencies: [
-        // No external dependencies for the library itself at this point.
-        // React Native will be linked by the consuming application.
+        // Add React Native as a dependency if you need to test interactions with React types.
+        // However, for testing Ussd.swift in isolation, we might not need it here
+        // if we can mock the RCTBridgeModule aspects.
+        // For now, let's assume we mock what's needed from React.
     ],
     targets: [
         .target(
             name: "Ussd",
-            dependencies: [], // No external SPM dependencies for this target
-            path: ".", // Assumes sources are in the root of the 'ios' directory or subdirectories
-            sources: ["."], // Specify source files, e.g., ["Ussd.swift"] or ["."] for all valid sources
-            publicHeadersPath: nil // No public headers needed if it's a pure Swift module or uses a bridging header internally
+            dependencies: [],
+            path: ".", // Assumes sources are in the root of the 'ios' directory
+            sources: ["Ussd.swift"] // Explicitly list sources
+        ),
+        .testTarget(
+            name: "UssdTests",
+            dependencies: ["Ussd"], // Depends on the main Ussd target
+            path: "Tests/UssdTests" // Specify path for test files
         )
     ]
 )
