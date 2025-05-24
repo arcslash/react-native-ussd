@@ -4,6 +4,7 @@
   "version": "1.0.21",
   "description": "USSD implementation for React Native",
   "main": "index.js",
+  "type": "module",
   "files": [
     "README.md",
     "android",
@@ -12,7 +13,8 @@
     "react-native-ussd.podspec"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:js": "eslint ."
   },
   "repository": {
     "type": "git",
