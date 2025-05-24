@@ -4,6 +4,7 @@
   "version": "1.0.21",
   "description": "USSD implementation for React Native",
   "main": "index.js",
+  "type": "module",
   "files": [
     "README.md",
     "index.js",
