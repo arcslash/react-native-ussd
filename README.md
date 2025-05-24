@@ -84,6 +84,34 @@ this.eventListener.remove();
 
 ```
 
+## Contributing
+
+Contributions are welcome! We appreciate any help to improve this library. Please feel free to report bugs, suggest features, or submit pull requests.
+
+### Reporting Issues
+
+*   Use GitHub Issues to report bugs or suggest new features.
+*   Please provide as much detail as possible, including React Native version, platform (Android/iOS), library version, steps to reproduce, and expected vs. actual behavior.
+
+### Development Process
+
+1.  **Fork & Clone:** Fork the repository and clone it locally.
+2.  **Branch:** Create a new branch for your feature or bug fix: `git checkout -b my-feature-branch`.
+3.  **Code:** Make your changes.
+    *   **Style:** Please adhere to the coding style enforced by our linters:
+        *   JavaScript/React: ESLint (run `npm run lint:js`)
+        *   Kotlin: ktlint (run `cd android && ./gradlew ktlintCheck`)
+        *   Swift: (If SwiftLint is enabled in CI, ensure your code passes its checks.)
+    *   **Tests:** Add or update tests for your changes. Run all tests to ensure nothing is broken:
+        *   `npm run test:js` (Placeholder for JS tests)
+        *   `npm run test:android` (Runs Android unit tests)
+        *   `npm run test:ios` (Runs iOS Swift Package tests)
+        *   Or run all with `npm test`.
+4.  **Commit:** Commit your changes with a clear and descriptive commit message.
+5.  **Push:** Push your branch to your fork: `git push origin my-feature-branch`.
+6.  **Pull Request:** Open a pull request against the main repository branch. Provide a clear description of your changes.
+
+We'll review your PR as soon as possible!
 
 Example Usecase
 
