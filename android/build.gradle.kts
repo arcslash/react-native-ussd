@@ -16,7 +16,7 @@ plugins {
 }
 
 val defaultCompileSdk = 33
-val defaultMinSdk = 21
+val defaultMinSdk = 31
 val defaultTargetSdk = 33
 
 android {

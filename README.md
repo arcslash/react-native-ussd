@@ -1,20 +1,25 @@
 # react-native-ussd
-React Native Library to handle USSD. Basic dialing support for iOS is now available.
+React Native Library to handle USSD calls.
+The Android module is written in Kotlin and the iOS module is written in Swift.
+Basic dialing support for iOS is available.
 
-TODO: Need to implement functionalities for IOS, Currently only work for Android
 ## Getting started
 
 `$ npm install react-native-ussd --save`
 
-### Mostly automatic installation
-
-`$ react-native link react-native-ussd`
+### Installation
+After installing with npm, React Native's auto-linking mechanism will handle linking the Android module.
+For iOS, this library is distributed as a Swift Package. Add it to your application project using Xcode:
+1. Go to File > Add Packages...
+2. Enter the repository URL for this package.
+3. Select the package and add it to your app's target.
 
 
 ## Usage
 Following configurations need to be done before using in either of the platforms
 
 ### Android
+**Minimum Android Version: 12 (API 31)**
 
 Add permissions to Make calls in the Manifest
 
@@ -23,9 +28,11 @@ Add permissions to Make calls in the Manifest
 <uses-permission android:name="android.permission.CALL_PHONE"/>
 <application...>
 ```
-The library has been updated to target newer Android SDKs (API 33). Ensure your project's Android configuration is compatible.
+The library has been updated to use Kotlin and targets Android 12 (API 31) and newer. Ensure your project's Android configuration is compatible.
 
 ### IOS
+**Minimum iOS Version: 14.0**
+The iOS module is written in Swift and integrated using Swift Package Manager.
 
 Basic USSD dialing is supported on iOS.
 - Calling `Ussd.dial()` will open the native iOS dialer and pre-fill the USSD code. The user then needs to manually initiate the call.
