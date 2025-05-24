@@ -1,0 +1,98 @@
+name: CI - Build & Test
+
+on:
+  push:
+    branches: [ main, master, develop ] # Adjust branches as needed
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Specify Node.js version
+
+      - name: Install JS dependencies
+        run: npm install # Assuming package-lock.json exists for reproducible builds
+
+      - name: Lint JavaScript
+        run: npm run lint:js # Placeholder: This script needs to be added to package.json
+
+      # Kotlin Linting (ktlint) - via Gradle
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' # React Native typically needs Java 11 or 17
+
+      - name: Lint Kotlin
+        run: cd android && ./gradlew ktlintCheck # Placeholder: ktlint gradle plugin needs to be configured
+
+  # Swift Linting (SwiftLint) - Requires macOS runner
+  # Temporarily disabling SwiftLint job due to runner constraints / setup complexity for this subtask.
+  # swift-lint:
+  #   name: Lint Swift
+  #   runs-on: macos-latest # SwiftLint typically runs on macOS
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+  #     - name: Install SwiftLint (if not cached)
+  #       run: |
+  #         if ! command -v swiftlint &> /dev/null
+  #         then
+  #             brew install swiftlint
+  #         fi
+  #     - name: Lint Swift
+  #       run: cd ios && swiftlint --strict # Placeholder: .swiftlint.yml might be needed
+
+  build_and_test_android:
+    name: Build & Test Android
+    runs-on: ubuntu-latest
+    needs: lint # Depends on lint job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Grant gradlew execution permission
+        run: chmod +x android/gradlew
+
+      - name: Run Android Unit Tests
+        run: cd android && ./gradlew testDebugUnitTest
+
+      - name: Build Android Release
+        run: cd android && ./gradlew assembleRelease
+
+  build_and_test_ios:
+    name: Build & Test iOS
+    runs-on: macos-latest # iOS builds and tests require macOS
+    needs: lint # Depends on lint job (or swift-lint if it were enabled)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '14.3.1' # Specify a recent Xcode version
+
+      - name: Run iOS Unit Tests
+        run: cd ios && swift test
+
+      - name: Build iOS Package
+        run: cd ios && swift build
