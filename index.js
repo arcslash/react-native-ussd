@@ -1,6 +1,6 @@
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
-const UssdModule = NativeModules.Ussd; // Renaming for clarity if preferred
+const UssdModule = NativeModules.Ussd;
 
 // Ensure UssdModule is defined. If not, provide a mock for non-native environments or throw error.
 if (!UssdModule) {
@@ -9,10 +9,6 @@ if (!UssdModule) {
 }
 
 export const ussdEventEmitter = UssdModule ? new NativeEventEmitter(UssdModule) : null;
-
-// Re-export constants for event names if they are exposed by native module's getConstants()
-// Example: export const USSDEvents = UssdModule ? UssdModule.getConstants() : {};
-// For now, assume event names are used as strings directly as per README.
 
 export interface SimInfo {
   slotIndex: number;
@@ -61,8 +57,6 @@ export async function startSession(ussdCode: string, options?: DialOptions): Pro
   if (!UssdModule || !UssdModule.startSession) {
     return Promise.reject(new Error("Ussd.startSession native method not available."));
   }
-  // Pass null for subscriptionId if options or options.subscriptionId is undefined.
-  // The native module handles the nullable Integer/NSNumber.
   return UssdModule.startSession(ussdCode, options?.subscriptionId ?? null);
 }
 
@@ -92,7 +86,7 @@ export async function sendMessage(message: string): Promise<string> {
  */
 export async function cancelSession(): Promise<void> {
   if (Platform.OS === 'ios') {
-    return Promise.resolve(); // No-op on iOS
+    return Promise.resolve(); 
   }
   if (!UssdModule || !UssdModule.cancelSession) {
     return Promise.reject(new Error("Ussd.cancelSession native method not available."));
@@ -106,10 +100,4 @@ export default {
   startSession,
   sendMessage,
   cancelSession,
-  // ussdEventEmitter should be imported directly by apps: 
-  // import { ussdEventEmitter } from 'react-native-ussd';
 };
-
-// It's good practice to also export types for event payloads if they are complex,
-// matching what's documented in README.md. For example:
-// export type { UssdSessionEvent, UssdErrorEvent, UssdSessionEndedEvent }; // (if defined elsewhere)

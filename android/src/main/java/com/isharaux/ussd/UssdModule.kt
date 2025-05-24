@@ -1,5 +1,6 @@
 package com.isharaux.ussd
 
+import android.Manifest
 import android.content.Context
 import android.os.Build
 import android.os.Handler
@@ -10,7 +11,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import javax.annotation.Nullable
+import javax.annotation.Nullable // Or androidx.annotation.Nullable, ensure one is consistently used or remove if not needed by modern Kotlin
 
 
 class UssdModule(private val reactContext: ReactApplicationContext) :
@@ -18,9 +19,9 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
 
     companion object {
         private val TAG = UssdModule::class.java.simpleName
-        const val EVENT_USSD_MESSAGE_RECEIVED = "ussdMessageReceived" // For unsolicited or ongoing messages
-        const val EVENT_USSD_ERROR = "ussdErrorEvent" // For errors in the USSD session
-        const val EVENT_LEGACY_USSD = "ussdEvent" // Legacy event, can be deprecated if not used by JS
+        const val EVENT_USSD_MESSAGE_RECEIVED = "ussdMessageReceived"
+        const val EVENT_USSD_ERROR = "ussdErrorEvent"
+        // const val EVENT_LEGACY_USSD = "ussdEvent" // Keep if backward compatibility for an old event is intended
 
         // Error Codes for Promises
         const val E_SESSION_ACTIVE = "E_SESSION_ACTIVE"
@@ -30,6 +31,7 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
         const val E_USSD_FAILED = "E_USSD_FAILED"
         const val E_SESSION_CANCELLED = "E_SESSION_CANCELLED"
         const val E_UNKNOWN_ERROR = "E_UNKNOWN_ERROR"
+        const val E_PERMISSION_DENIED_SIM_INFO = "E_PERMISSION_DENIED_SIM_INFO" // Specific for getSimInfo
     }
 
     private var currentSessionPromise: Promise? = null
@@ -39,7 +41,7 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
 
     private val ussdResponseCallbackHandler = object : TelephonyManager.UssdResponseCallback() {
         override fun onReceiveUssdResponse(
-            telephonyManager: TelephonyManager, // This is the TM that handled the response
+            telephonyManager: TelephonyManager, 
             request: String,
             response: CharSequence
         ) {
@@ -50,15 +52,13 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
                 it.resolve(responseString)
                 currentSessionPromise = null
             } ?: run {
-                // No specific promise waiting, treat as an ongoing message or unsolicited
                 Log.w(TAG, "Received USSD response but no active promise. Sending as general event.")
                 val params = Arguments.createMap().apply {
                     putString("message", responseString)
-                    putString("requestSent", request) // The original request that triggered this if available
+                    putString("requestSent", request) 
                 }
                 sendEvent(EVENT_USSD_MESSAGE_RECEIVED, params)
             }
-            // Important: isSessionActive remains true. JS layer decides if session ends.
         }
 
         override fun onReceiveUssdResponseFailed(
@@ -70,7 +70,7 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
             val errorMessage = "USSD request failed for '$request' with code: $failureCode"
 
             currentSessionPromise?.let {
-                it.reject(E_USSD_FAILED, errorMessage, null) // Consider adding failureCode to error details map
+                it.reject(E_USSD_FAILED, errorMessage, null) 
                 currentSessionPromise = null
             }
 
@@ -92,7 +92,7 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
         val constants = HashMap<String, Any>()
         constants["EVENT_USSD_MESSAGE_RECEIVED"] = EVENT_USSD_MESSAGE_RECEIVED
         constants["EVENT_USSD_ERROR"] = EVENT_USSD_ERROR
-        constants["EVENT_LEGACY_USSD"] = EVENT_LEGACY_USSD // If JS still uses this
+        // constants["EVENT_LEGACY_USSD"] = EVENT_LEGACY_USSD // Only if needed
         return constants
     }
 
@@ -104,43 +104,40 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
             return
         }
 
-        currentSessionPromise = promise // Store the promise for this operation
+        currentSessionPromise = promise 
 
         try {
             val defaultTelephonyManager =
                 reactContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
 
             if (defaultTelephonyManager == null) {
+                currentSessionPromise = null // Clear before rejecting
                 promise.reject(E_TELEPHONY_NOT_AVAILABLE, "TelephonyManager not available.")
                 return
             }
-            
+
             var selectedTelephonyManager = defaultTelephonyManager
 
             if (subscriptionIdInput != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                val subscriptionId = subscriptionIdInput.toInt() // Ensure it's Int
+                val subscriptionId = subscriptionIdInput.toInt() 
                 try {
+                    // Note: READ_PHONE_STATE is needed for createForSubscriptionId by system apps or privileged apps.
+                    // Regular apps usually don't need it if they just pass a subId obtained from SubscriptionManager.
                     val specificTm = defaultTelephonyManager.createForSubscriptionId(subscriptionId)
                     if (specificTm != null) {
                         selectedTelephonyManager = specificTm
                         Log.d(TAG, "Using TelephonyManager for subscription ID: $subscriptionId")
                     } else {
                         Log.w(TAG, "Failed to get TelephonyManager for subscription ID: $subscriptionId. Falling back to default.")
-                        // Optionally, could reject promise here if specific SIM is strictly required.
-                        // promise.reject(E_TELEPHONY_NOT_AVAILABLE, "Could not obtain TelephonyManager for specified SIM.")
-                        // return
                     }
                 } catch (e: SecurityException) {
                     Log.e(TAG, "SecurityException when creating TelephonyManager for subscription ID $subscriptionId: ${e.message}", e)
-                    // Fallback to default or reject. For now, log and continue with default.
-                    // Consider rejecting if strict SIM selection is required:
-                    // promise.reject(E_SECURITY_EXCEPTION, "Permission denied for specific SIM selection.", e)
-                    // return
+                    // Fall back to default or reject if strict SIM selection is critical
                 }
             }
-            
+
             activeTelephonyManager = selectedTelephonyManager
-            isSessionActive = true // Set active *before* sending request, to handle immediate failure/response
+            isSessionActive = true 
 
             Log.d(TAG, "Sending USSD request: $ussdCode via selected TelephonyManager.")
             activeTelephonyManager!!.sendUssdRequest(ussdCode, ussdResponseCallbackHandler, mainHandler)
@@ -148,9 +145,9 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
 
         } catch (se: SecurityException) {
             Log.e(TAG, "SecurityException during USSD request initiation: ${se.message}", se)
-            isSessionActive = false // Reset state
+            isSessionActive = false 
             activeTelephonyManager = null
-            currentSessionPromise = null // Clear stored promise
+            currentSessionPromise = null 
             promise.reject(E_SECURITY_EXCEPTION, "Telephony permission denied. Is CALL_PHONE permission granted?", se)
         } catch (e: Exception) {
             Log.e(TAG, "Error starting USSD session: ${e.message}", e)
@@ -169,15 +166,13 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
             return
         }
 
-        currentSessionPromise = promise // Store promise for this message
+        currentSessionPromise = promise 
 
         try {
             Log.d(TAG, "Sending USSD message: $message via active TelephonyManager.")
             activeTelephonyManager!!.sendUssdRequest(message, ussdResponseCallbackHandler, mainHandler)
-            // Promise resolved/rejected by callback handler.
         } catch (se: SecurityException) {
             Log.e(TAG, "SecurityException during USSD sendMessage: ${se.message}", se)
-            // Don't necessarily kill the whole session here, but this message failed.
             currentSessionPromise = null
             promise.reject(E_SECURITY_EXCEPTION, "Telephony permission denied for sending message.", se)
         } catch (e: Exception) {
@@ -191,18 +186,16 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
     fun cancelSession(promise: Promise) {
         Log.d(TAG, "Attempting to cancel USSD session.")
         currentSessionPromise?.let {
-            // A pending operation exists, reject it as cancelled.
             it.reject(E_SESSION_CANCELLED, "USSD session cancelled by user.")
             currentSessionPromise = null
         }
 
         isSessionActive = false
         activeTelephonyManager = null 
-        // No specific TelephonyManager API to cancel a USSD session, this is local state cleanup.
         Log.i(TAG, "USSD session state cleaned up.")
         promise.resolve(null)
     }
-    
+
     @ReactMethod
     fun getSimInfo(promise: Promise) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -220,38 +213,48 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
                 promise.resolve(Arguments.createArray())
                 return
             }
-            
+
             val subInfoList: List<SubscriptionInfo>? = try {
+                // READ_PHONE_STATE is required for getActiveSubscriptionInfoList.
+                // The calling app must declare and have this permission.
+                if (reactContext.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                     promise.reject(E_PERMISSION_DENIED_SIM_INFO, "Missing READ_PHONE_STATE permission for getSimInfo.")
+                     return
+                }
                 subscriptionManager.activeSubscriptionInfoList
             } catch (se: SecurityException) {
                 Log.e(TAG, "SecurityException getting activeSubscriptionInfoList: ${se.message}", se)
-                promise.reject("E_PERMISSION_DENIED_SIM_INFO", "Missing READ_PHONE_STATE for getSimInfo.", se)
+                promise.reject(E_PERMISSION_DENIED_SIM_INFO, "Missing READ_PHONE_STATE for getSimInfo: ${se.message}", se)
                 return
             }
-
-
+            
             val simInfos = Arguments.createArray()
             if (subInfoList != null) {
                 for (info in subInfoList) {
                     val simInfoMap = Arguments.createMap()
                     simInfoMap.putInt("subscriptionId", info.subscriptionId)
-                    simInfoMap.putInt("slotIndex", info.simSlotIndex) // Typically 0-based
+                    simInfoMap.putInt("slotIndex", info.simSlotIndex) 
                     info.carrierName?.let { simInfoMap.putString("carrierName", it.toString()) }
                     info.countryIso?.let { simInfoMap.putString("countryIso", it.toString().uppercase()) }
+                    
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         info.mccString?.let { simInfoMap.putString("mobileCountryCode", it) }
                         info.mncString?.let { simInfoMap.putString("mobileNetworkCode", it) }
                     } else {
-                        simInfoMap.putString("mobileCountryCode", info.mcc.toString().takeIf { it != "0" })
-                        simInfoMap.putString("mobileNetworkCode", info.mnc.toString().takeIf { it != "0" })
+                        // For older APIs, mcc and mnc are integers. Convert to string if not 0 or default invalid value.
+                        // Check SubscriptionInfo.getMcc/getMnc documentation for how invalid/unavailable is represented if not 0.
+                        if (info.mcc != 0 && info.mcc != Int.MAX_VALUE) simInfoMap.putString("mobileCountryCode", info.mcc.toString())
+                        if (info.mnc != 0 && info.mnc != Int.MAX_VALUE) simInfoMap.putString("mobileNetworkCode", info.mnc.toString())
                     }
-                    
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // READ_PHONE_NUMBERS is API 23
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { 
                          try {
+                            // READ_PHONE_NUMBERS (API 23+), READ_SMS or carrier privileges are needed for info.getNumber()
+                            // This check is illustrative; direct permission check before call is better.
                             info.number?.let { simInfoMap.putString("phoneNumber", it) } ?: simInfoMap.putNull("phoneNumber")
                         } catch (se: SecurityException) {
                             Log.w(TAG, "Could not get phone number for sub ${info.subscriptionId} due to SecurityException: ${se.message}")
-                            simInfoMap.putNull("phoneNumber") // Explicitly set to null on error
+                            simInfoMap.putNull("phoneNumber") 
                         }
                     } else {
                          simInfoMap.putNull("phoneNumber") 
@@ -260,7 +263,7 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
                 }
             }
             promise.resolve(simInfos)
-        } catch (e: Exception) { // Catch other potential exceptions during SIM info processing
+        } catch (e: Exception) { 
             Log.e(TAG, "Failed to get SIM info: ${e.message}", e)
             promise.reject(E_UNKNOWN_ERROR, "Failed to get SIM info: ${e.message}", e)
         }
