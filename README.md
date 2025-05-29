@@ -242,4 +242,26 @@ const ussdErrorEventListener = ussdEventEmitter.addListener('ussdErrorEvent', (e
 // }, []);
 
 ```
-The previous example can be adapted. The core functionalities `Ussd.dial`, `Ussd.getSimInfo`, and `ussdEventEmitter` are the building blocks.
+The previous example can beadapted. The core functionalities `Ussd.dial`, `Ussd.getSimInfo`, and `ussdEventEmitter` are the building blocks.
+
+## Running Tests
+
+This project uses [Jest](https://jestjs.io/) as its testing framework. The tests cover the core functionalities of the library for both Android and iOS platforms by mocking native module interactions.
+
+To run all tests, execute the following command from the project root:
+
+```bash
+npm test
+```
+
+To run tests for a specific file, you can use:
+
+```bash
+npm test <fileNameToTest>
+```
+For example, to run only the tests for the `dial` functionality:
+```bash
+npm test dial.test.js
+```
+
+Ensure you have installed the project dependencies (`npm install`) before running the tests.
