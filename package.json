@@ -1,7 +1,7 @@
 {
   "name": "react-native-ussd",
   "title": "React Native Ussd",
-  "version": "1.0.22",
+  "version": "1.0.21",
   "description": "USSD implementation for React Native",
   "main": "index.js",
   "type": "module",
@@ -42,6 +42,8 @@
     "@babel/preset-env": "^7.27.2",
     "@react-native/babel-preset": "^0.79.2",
     "babel-jest": "^30.0.0-beta.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
     "jest": "^29.7.0",
     "react": "^19.0.0",
     "react-native": "^0.79.2",
