@@ -286,7 +286,3 @@ This project uses GitHub Actions to automate linting, testing, and publishing to
         *   Sets up Node.js and configures it for npm publishing.
         *   Installs dependencies (`npm install`).
         *   Publishes the package to npm (`npm publish`).
-
-**NPM Publishing:**
-
-For automatic publishing to npm to work, a secret named `NPM_TOKEN` must be configured in the GitHub repository settings. This token should be an npm access token with permission to publish the package.
