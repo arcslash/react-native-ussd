@@ -265,3 +265,28 @@ npm test dial.test.js
 ```
 
 Ensure you have installed the project dependencies (`npm install`) before running the tests.
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions to automate linting, testing, and publishing to npm.
+
+**Workflow:**
+
+*   **Trigger:** The workflow automatically runs on every push to the `master` branch.
+*   **Jobs:**
+    1.  `lint-test`:
+        *   Checks out the code.
+        *   Sets up Node.js.
+        *   Installs dependencies (`npm install`).
+        *   Runs the linter (`npm run lint:js`).
+        *   Runs tests (`npm test`).
+    2.  `publish-npm`:
+        *   Depends on the successful completion of the `lint-test` job.
+        *   Checks out the code.
+        *   Sets up Node.js and configures it for npm publishing.
+        *   Installs dependencies (`npm install`).
+        *   Publishes the package to npm (`npm publish`).
+
+**NPM Publishing:**
+
+For automatic publishing to npm to work, a secret named `NPM_TOKEN` must be configured in the GitHub repository settings. This token should be an npm access token with permission to publish the package.
