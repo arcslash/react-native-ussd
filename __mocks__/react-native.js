@@ -40,7 +40,7 @@ const mockRemoveListenersImplementation = jest.fn((countOrEventName) => {
 });
 
 
-const NativeEventEmitter = jest.fn().mockImplementation(function(nativeModule) {
+const NativeEventEmitter = jest.fn().mockImplementation(function() {
   this.addListener = mockAddListenerImplementation; // Use the implementation
   this.removeListeners = mockRemoveListenersImplementation; // Use the implementation
   return this;
