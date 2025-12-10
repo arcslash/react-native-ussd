@@ -2,18 +2,23 @@
   "name": "react-native-ussd",
   "title": "React Native Ussd",
   "version": "1.0.22",
-  "description": "USSD implementation for React Native",
+  "description": "USSD implementation for React Native with advanced features like interactive sessions, carrier detection, response parsing, and analytics",
   "main": "index.js",
+  "types": "index.d.ts",
   "type": "module",
   "files": [
     "README.md",
     "android",
     "index.js",
+    "index.d.ts",
+    "src",
     "ios",
     "react-native-ussd.podspec"
   ],
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint:js": "eslint ."
   },
   "repository": {
@@ -21,14 +26,33 @@
     "url": "git+https://github.com/isharaux/react-native-ussd.git",
     "baseUrl": "https://github.com/isharaux/react-native-ussd.git"
   },
+  "bugs": {
+    "url": "https://github.com/isharaux/react-native-ussd/issues"
+  },
+  "homepage": "https://github.com/isharaux/react-native-ussd#readme",
   "keywords": [
     "react-native",
     "ussd",
-    "ussd-dial"
+    "ussd-dial",
+    "ussd-codes",
+    "ussd-session",
+    "mobile",
+    "telecom",
+    "sim",
+    "dual-sim",
+    "carrier",
+    "balance-check",
+    "data-bundles",
+    "airtime",
+    "interactive-ussd",
+    "ussd-parser",
+    "ussd-validator",
+    "android",
+    "ios"
   ],
   "author": {
     "name": "Ishara Abeykoon",
-    "email": "isharaux@gmil.com"
+    "email": "isharaux@gmail.com"
   },
   "license": "MIT",
   "licenseFilename": "LICENSE",

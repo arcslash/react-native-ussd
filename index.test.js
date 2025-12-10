@@ -5,8 +5,12 @@ import { NativeModules, NativeEventEmitter } from 'react-native';
 jest.mock('react-native');
 
 describe('Library Exports (index.js)', () => {
-  it('should export NativeModules.Ussd as the default export', () => {
-    expect(UssdExport).toBe(NativeModules.Ussd);
+  it('should export a Ussd wrapper object with all methods', () => {
+    expect(UssdExport).toBeDefined();
+    expect(typeof UssdExport.dial).toBe('function');
+    expect(typeof UssdExport.getSimInfo).toBe('function');
+    expect(typeof UssdExport.dialWithRetry).toBe('function');
+    expect(typeof UssdExport.dialBatch).toBe('function');
   });
 
   it('should export ussdEventEmitter as an instance of NativeEventEmitter', () => {
