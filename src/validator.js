@@ -1,5 +1,3 @@
-import { UssdErrorCode } from './constants';
-
 /**
  * USSD code validation utilities
  */
