@@ -16,11 +16,11 @@ export const UssdParser = {
     // Common balance patterns
     const patterns = [
       // "Your balance is 100.50" or "Balance: 100.50"
-      /balance[:\s]+(?:is\s+)?[\$£€KSh\s]*([0-9,]+\.?[0-9]*)/i,
+      /balance[:\s]+(?:is\s+)?[$£€KSh\s]*([0-9,]+\.?[0-9]*)/i,
       // "Ksh 100.50" or "$100.50"
       /(?:Ksh|KES|USD|GBP|EUR|NGN|ZAR|UGX|TZS)[\s]*([0-9,]+\.?[0-9]*)/i,
       // Standalone number with currency symbol
-      /[\$£€][\s]*([0-9,]+\.?[0-9]*)/,
+      /[$£€][\s]*([0-9,]+\.?[0-9]*)/,
       // Number followed by currency
       /([0-9,]+\.?[0-9]*)[\s]*(?:Ksh|KES|USD|GBP|EUR|NGN|ZAR|bob|birr)/i,
     ];
@@ -36,7 +36,7 @@ export const UssdParser = {
 
         // Try to detect currency from the match
         if (!detectedCurrency) {
-          const currencyMatch = response.match(/(Ksh|KES|USD|GBP|EUR|NGN|ZAR|UGX|TZS|[\$£€])/i);
+          const currencyMatch = response.match(/(Ksh|KES|USD|GBP|EUR|NGN|ZAR|UGX|TZS|[$£€])/i);
           if (currencyMatch) {
             const currMap = {
               'Ksh': 'KES',
@@ -227,7 +227,7 @@ export const UssdParser = {
     }
 
     // Look for numbered options like "1. Option" or "1) Option"
-    const menuPattern = /^\s*\d+[\.)]\s*.+$/m;
+    const menuPattern = /^\s*\d+[.)]\s*.+$/m;
     return menuPattern.test(response);
   },
 
@@ -246,7 +246,7 @@ export const UssdParser = {
 
     for (const line of lines) {
       // Match lines like "1. Option" or "1) Option"
-      const match = line.match(/^\s*(\d+)[\.)]\s*(.+)$/);
+      const match = line.match(/^\s*(\d+)[.)]\s*(.+)$/);
       if (match) {
         options.push({
           number: match[1],
