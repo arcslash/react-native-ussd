@@ -76,10 +76,9 @@ class UssdModule(private val reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun dial(code: String, options: ReadableMap?, promise: Promise) {
-        val subscriptionId = options?.getInt("subscriptionId")
-        val timeout = options?.getInt("timeout")?.toLong() ?: timeoutMs
-        val isSecure = options?.getBoolean("secureMode") ?: secureMode
+    fun dial(code: String, subscriptionId: Int?, promise: Promise) {
+        val timeout = timeoutMs
+        val isSecure = secureMode
 
         Log.d(TAG, "Dialing code: $code on subscription: $subscriptionId")
 
